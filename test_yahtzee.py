@@ -1,6 +1,6 @@
 import unittest
 
-from yahtzee import score, validate
+from yahtzee import Group, score, validate
 from yahtzee import ones, twos, threes, fours, fives, sixes
 from yahtzee import pair, three_of_kind, four_of_kind
 from yahtzee import two_pairs, small_straight, large_straight
@@ -10,8 +10,14 @@ from yahtzee import full_house, yahtzee, chance
 class ValidateTest(unittest.TestCase):
 
     def testValidate(self):
-        self.assertEqual(validate('12345'), [1, 2, 3, 4, 5])
-        self.assertEqual(validate('12121'), [1, 1, 1, 2, 2])
+        self.assertEqual(
+            validate('12345'),
+            {Group(n, 1) for n in [1, 2, 3, 4, 5]}
+        )
+        self.assertEqual(
+            validate('12121'),
+            {Group(1, 3), Group(2, 2)}
+        )
 
     def testValidateTooShortRaises(self):
         with self.assertRaises(ValueError):
@@ -61,7 +67,10 @@ class CategoryTest(unittest.TestCase):
 
     def testPair(self):
         self.assertEqual(score('12345', pair), 0)
-        self.assertEqual(score('11234', pair), 2)
+        self.assertEqual(score('12234', pair), 4)
+        self.assertEqual(score('12224', pair), 4)
+        self.assertEqual(score('12222', pair), 4)
+        self.assertEqual(score('22222', pair), 4)
         self.assertEqual(score('11224', pair), 4)
         self.assertEqual(score('11244', pair), 8)
 
@@ -85,6 +94,8 @@ class CategoryTest(unittest.TestCase):
         self.assertEqual(score('11234', two_pairs), 0)
         self.assertEqual(score('11224', two_pairs), 6)
         self.assertEqual(score('11244', two_pairs), 10)
+        self.assertEqual(score('11144', two_pairs), 10)
+        self.assertEqual(score('11444', two_pairs), 10)
 
     def testSmallStraight(self):
         self.assertEqual(score('54321', small_straight), 15)
