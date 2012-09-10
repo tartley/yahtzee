@@ -79,6 +79,8 @@ class CategoryTest(unittest.TestCase):
 
 
     def testTwoPairs(self):
+        self.assertEqual(score('11234', two_pairs), 0)
+        self.assertEqual(score('11114', two_pairs), 0)
         self.assertEqual(score('12345', two_pairs), 0)
         self.assertEqual(score('11234', two_pairs), 0)
         self.assertEqual(score('11224', two_pairs), 6)

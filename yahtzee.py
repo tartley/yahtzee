@@ -14,7 +14,7 @@ def validate(dice_str):
 
 
 def _single(roll, numerator):
-    return roll.count(numerator) * numerator
+    return filter(lambda item: item == numerator, roll)
 
 def ones(roll):
     return _single(roll, 1)
@@ -35,72 +35,55 @@ def sixes(roll):
     return _single(roll, 6)
 
 
-def _counts(roll):
-    return {
-        die: roll.count(die)
-        for die in set(roll) 
-    }
-
-
 def _n_of_kind(roll, n):
-    '''
-    return a set of the value of all 'n of a kind' groups in 'roll'
-    e.g. _n_of_kind([1, 2, 2, 3, 3], 2) == {2, 3}
-    '''
-    return {
-        item[0] for item in 
-        filter(lambda (die, count): count == n, _counts(roll).items())
-    }
+    return [die for die in roll if roll.count(die) == n]
 
+def _pairs(roll):
+    return _n_of_kind(roll, 2)
 
-def _score_n_of_kind(roll, n):
-    kinds = _n_of_kind(roll, n)
-    if kinds:
-        return max(kinds) * n
-    else:
-        return 0
+def _get_highest(roll):
+    return [die for die in roll if die == max(roll)]
 
 def pair(roll):
-    return _score_n_of_kind(roll, 2)
+    return _get_highest(_pairs(roll))
 
 def three_of_kind(roll):
-    return _score_n_of_kind(roll, 3)
+    return _n_of_kind(roll, 3)
 
 def four_of_kind(roll):
-    return _score_n_of_kind(roll, 4)
+    return _n_of_kind(roll, 4)
 
+
+def _get_two_highest(roll):
+    max_two = sorted(set(roll), reverse=True)[0:2]
+    return [
+        die for die in roll
+        if len(max_two) == 2 and die in max_two
+    ]
 
 def two_pairs(roll):
-    pairs = _n_of_kind(roll, 2)
-    if len(pairs) == 2:
-        return sum(value * 2 for value in pairs)
-    return 0
+    return _get_two_highest(_pairs(roll))
+
 
 def small_straight(roll):
-    return 15 if roll == [1, 2, 3, 4, 5] else 0
+    return roll if roll == [1, 2, 3, 4, 5] else []
 
 def large_straight(roll):
-    return 20 if roll == [2, 3, 4, 5, 6] else 0
+    return roll if roll == [2, 3, 4, 5, 6] else []
 
 
 def full_house(roll):
-    pairs = _n_of_kind(roll, 2)
+    pairs = _pairs(roll)
     threes = _n_of_kind(roll, 3)
-    if len(pairs) == len(threes) == 1:
-        return pairs.pop() * 2 + threes.pop() * 3
-    else:
-        return 0
+    return roll if len(pairs) == 2 and len(threes) == 3 else []
 
 def yahtzee(roll):
-    if _n_of_kind(roll, 5):
-        return 50
-    else:
-        return 0
+    return [50] if _n_of_kind(roll, 5) else []
 
 def chance(roll):
-    return sum(roll)
+    return roll
 
 
 def score(dice, category):
-    return category(validate(dice))
+    return sum(category(validate(dice)))
 
