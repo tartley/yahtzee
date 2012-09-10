@@ -115,6 +115,8 @@ class CategoryTest(unittest.TestCase):
         self.assertEqual(score('11133', full_house), 9)
         self.assertEqual(score('66555', full_house), 27)
 
+        self.assertEqual(score('44444', full_house), 0)
+
     def testYahtzee(self):
         self.assertEqual(score('11112', yahtzee), 0)
         self.assertEqual(score('11111', yahtzee), 50)
